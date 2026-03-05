@@ -17,6 +17,10 @@ export default defineConfig({
     },
   },
 
+  build: {
+    outDir: 'build',
+  },
+
   server: {
     // Proxy API requests to backend during local development
     proxy: {

@@ -44,16 +44,23 @@ app.use('/api/experts',       require('./routes/experts'));
 // the static files and return `index.html` for any non-/api route so SPA
 // reloads work correctly. If the build is missing we skip static serving.
 const fs = require('fs');
+// Prefer `frontend/build` (React-style) but fall back to `frontend/dist` (Vite default)
+const frontendBuild = path.join(__dirname, '..', '..', 'frontend', 'build');
 const frontendDist = path.join(__dirname, '..', '..', 'frontend', 'dist');
 try {
-  const indexPath = path.join(frontendDist, 'index.html');
+  let indexPath = path.join(frontendBuild, 'index.html');
+  let serveDir = frontendBuild;
+  if (!fs.existsSync(indexPath)) {
+    indexPath = path.join(frontendDist, 'index.html');
+    serveDir = frontendDist;
+  }
+
   if (fs.existsSync(indexPath)) {
-    app.use(express.static(frontendDist));
-    // SPA fallback for non-API GET requests
+    app.use(express.static(serveDir));
     app.get(/^\/(?!api).*/, (_req, res) => res.sendFile(indexPath));
-    console.log('[Server] Serving frontend from', frontendDist);
+    console.log('[Server] Serving frontend from', serveDir);
   } else {
-    console.log('[Server] Frontend dist not found; skipping static serving');
+    console.log('[Server] No frontend build found (tried build/ and dist/); skipping static serving');
   }
 } catch (err) {
   console.warn('[Server] Error configuring static serving:', err && err.message ? err.message : err);
