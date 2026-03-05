@@ -1,0 +1,13 @@
+{
+  "hosting": {
+    "public": "JURIS-main/src",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [{
+      "source": "**",
+      "destination": "/index.html"
+    }]
+  },
+  "firestore": {
+    "rules": "backend/firestore.rules"
+  }
+}

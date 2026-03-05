@@ -1,0 +1,41 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aswanayyappan/Juris.git"
+  },
+  "description": "",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "node scripts/test-api.js",
+    "start:with-frontend": "node scripts/start-with-frontend.js"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "scripts/*",
+      "node_modules/*"
+    ]
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.0",
+    "axios": "^1.13.5",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "firebase-admin": "^13.6.1",
+    "groq-sdk": "^0.37.0",
+    "node-cron": "^4.2.1",
+    "resend": "^6.9.2",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

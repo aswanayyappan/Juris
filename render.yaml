@@ -1,0 +1,39 @@
+services:
+  - type: static
+    name: juris-frontend
+    branch: main
+    repo: .
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    envVars:
+      # Set this to the backend service URL after backend deploy
+      # e.g. https://juris-backend.onrender.com/api
+      - key: VITE_API_URL
+        value: ""
+
+  - type: web
+    name: juris-backend
+    env: node
+    branch: main
+    repo: .
+    plan: starter
+    buildCommand: npm --prefix backend install
+    startCommand: npm --prefix backend start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      # Set to frontend static site URL for CORS (e.g. https://juris-frontend.onrender.com)
+      - key: FRONTEND_URL
+        value: ""
+      # Set sensitive secrets in the Render dashboard (do NOT commit them)
+      - key: FIREBASE_PROJECT_ID
+        value: ""
+      - key: FIREBASE_CLIENT_EMAIL
+        value: ""
+      - key: FIREBASE_PRIVATE_KEY
+        value: ""
+      - key: GROQ_API_KEY
+        value: ""
+      - key: RESEND_API_KEY
+        value: ""
