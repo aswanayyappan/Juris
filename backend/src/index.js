@@ -39,22 +39,24 @@ app.use('/api/experts',       require('./routes/experts'));
 // Frontend static-serving removed: backend exposes API routes only.
 // If you want a single-service deployment that serves the SPA, build the
 // frontend into `frontend/dist` and re-enable static middleware intentionally.
-// Attempt to serve built frontend when available. This is safe: if the build
-// isn't present we skip static serving. During Render deploy the `postinstall`
-// script will try to build the frontend so `frontend/dist` exists.
+
+// Safe static serving: if the frontend was built into `frontend/dist`, serve
+// the static files and return `index.html` for any non-/api route so SPA
+// reloads work correctly. If the build is missing we skip static serving.
 const fs = require('fs');
 const frontendDist = path.join(__dirname, '..', '..', 'frontend', 'dist');
 try {
   const indexPath = path.join(frontendDist, 'index.html');
   if (fs.existsSync(indexPath)) {
     app.use(express.static(frontendDist));
+    // SPA fallback for non-API GET requests
     app.get(/^\/(?!api).*/, (_req, res) => res.sendFile(indexPath));
     console.log('[Server] Serving frontend from', frontendDist);
   } else {
-    console.log('[Server] Frontend dist not found; static serving disabled.');
+    console.log('[Server] Frontend dist not found; skipping static serving');
   }
 } catch (err) {
-  console.warn('[Server] Error checking frontend dist:', err && err.message ? err.message : err);
+  console.warn('[Server] Error configuring static serving:', err && err.message ? err.message : err);
 }
 
 // ── Health check (PRD: GET /api/health) ───────────────────────────────────────
