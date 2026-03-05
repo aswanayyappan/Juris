@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router';
 import { motion } from 'motion/react';
 import {
-  Scale, MessageSquare, Shield, ArrowRight, CheckCircle,
-  Star, Users, FileText, TrendingUp, Zap, Lock
+  Scale, MessageSquare, ArrowRight, CheckCircle,
+  Users, TrendingUp, Zap, Lock
 } from 'lucide-react';
 
 /* ─── Stat data ─────────────────────────────── */
@@ -62,27 +62,6 @@ const steps = [
     icon: CheckCircle,
     title: 'Stay Compliant',
     desc: 'Register your business, track filings, and receive automated compliance reminders.',
-  },
-];
-
-const testimonials = [
-  {
-    name: 'Priya Sharma',
-    role: 'Founder, TechStartup Pvt Ltd',
-    text: 'JURIS saved me thousands in compliance penalties. The AI assistant explained my GST obligations in plain language.',
-    rating: 5,
-  },
-  {
-    name: 'Adv. Rajesh Kumar',
-    role: 'Senior Advocate, Delhi HC',
-    text: 'As a legal professional, the case search feature is invaluable. Comprehensive database with excellent filtering.',
-    rating: 5,
-  },
-  {
-    name: 'Meera Nair',
-    role: 'CFO, Manufacturing Co.',
-    text: 'The business compliance tracker is exceptional. We\'ve never missed a ROC filing since we started using JURIS.',
-    rating: 5,
   },
 ];
 
@@ -237,51 +216,6 @@ export const Landing: React.FC = () => {
               Sign In
             </Link>
           </motion.div>
-
-          {/* Trust indicators */}
-          <motion.div
-            className="flex items-center justify-center gap-6 mt-12 text-sm text-slate-500"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-          >
-            {['No credit card required', 'Free 10 queries on signup', 'Cancel anytime'].map((item) => (
-              <div key={item} className="flex items-center gap-1.5">
-                <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />
-                <span>{item}</span>
-              </div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ─── STATS ──────────────────────────── */}
-      <section className="py-16 px-6 relative">
-        <div className="max-w-5xl mx-auto">
-          <div
-            className="grid grid-cols-2 md:grid-cols-4 gap-px rounded-2xl overflow-hidden"
-            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.06)' }}
-          >
-            {stats.map((stat, i) => (
-              <motion.div
-                key={stat.label}
-                className="text-center py-8 px-4"
-                style={{ background: 'rgba(10,16,32,0.8)' }}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-              >
-                <div
-                  className="text-3xl md:text-4xl font-bold mb-1"
-                  style={{ fontFamily: 'Playfair Display, serif', color: '#F59E0B' }}
-                >
-                  {stat.value}
-                </div>
-                <div className="text-sm text-slate-400">{stat.label}</div>
-              </motion.div>
-            ))}
-          </div>
         </div>
       </section>
 
