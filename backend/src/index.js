@@ -36,19 +36,9 @@ app.use('/api/cases',         require('./routes/cases'));
 app.use('/api/download',      require('./routes/download'));
 app.use('/api/experts',       require('./routes/experts'));
 
-// ── Serve frontend (single-port deployment) ───────────────────────────────────
-// The frontend should be built into `frontend/dist`. API routes take precedence.
-const frontendDist = path.join(__dirname, '..', '..', 'frontend', 'dist');
-try {
-  app.use(express.static(frontendDist));
-
-  // Serve index.html for any non-API GET requests (SPA fallback)
-  app.get(/^\/(?!api).*/, (_req, res) => {
-    res.sendFile(path.join(frontendDist, 'index.html'));
-  });
-} catch (err) {
-  console.warn('[Server] Frontend static not available:', err.message);
-}
+// Frontend static-serving removed: backend exposes API routes only.
+// If you want a single-service deployment that serves the SPA, build the
+// frontend into `frontend/dist` and re-enable static middleware intentionally.
 
 // ── Health check (PRD: GET /api/health) ───────────────────────────────────────
 app.get('/api/health', (_req, res) => res.json({ status: 'ok', ts: new Date() }));

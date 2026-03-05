@@ -6,13 +6,19 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-const DB_PATH = path.join(__dirname, '..', '..', 'cases.db');
+// Use the platform-writable temp directory in Render and other hosts.
+// Files under the project source may be read-only after build; default to /tmp.
+const DB_PATH = process.env.SQLITE_DB_PATH || '/tmp/cases.db';
 
-const db = new sqlite3.Database(DB_PATH, sqlite3.OPEN_READONLY, (err) => {
+// Open the DB read/write and create if missing. Fail fast if the DB cannot be opened.
+const db = new sqlite3.Database(DB_PATH, sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
   if (err) {
-    console.error('[SQLite] Error connecting to cases.db:', err.message);
+    console.error('[SQLite] Fatal: unable to open database at', DB_PATH, '-', err.message);
+    // Fail fast so the process doesn't run in a degraded state.
+    // In production orchestrators this will surface the problem immediately.
+    process.exit(1);
   } else {
-    console.log('[SQLite] ✅ Connected to cases.db');
+    console.log('[SQLite] ✅ Connected to', DB_PATH);
   }
 });
 
