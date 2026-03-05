@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors    = require('cors');
 const path    = require('path');
+const fs      = require('fs');
 
 const app = express();
 
@@ -9,7 +10,6 @@ const app = express();
 app.use(cors({
   origin: function (origin, callback) {
     const allowedFrontend = process.env.FRONTEND_URL;
-    // allow server-to-server requests (no origin), localhost dev, or configured FRONTEND_URL
     if (!origin
       || origin.startsWith('http://localhost:')
       || origin.startsWith('http://127.0.0.1:')
@@ -24,7 +24,7 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// ── Routes ────────────────────────────────────────────────────────────────────
+// ── API Routes ────────────────────────────────────────────────────────────────
 app.use('/api/auth',          require('./routes/auth'));
 app.use('/api/businesses',    require('./routes/businesses'));
 app.use('/api/tasks',         require('./routes/tasks'));
@@ -36,56 +36,44 @@ app.use('/api/cases',         require('./routes/cases'));
 app.use('/api/download',      require('./routes/download'));
 app.use('/api/experts',       require('./routes/experts'));
 
-// Frontend static-serving removed: backend exposes API routes only.
-// If you want a single-service deployment that serves the SPA, build the
-// frontend into `frontend/dist` and re-enable static middleware intentionally.
-
-// Safe static serving: if the frontend was built into `frontend/dist`, serve
-// the static files and return `index.html` for any non-/api route so SPA
-// reloads work correctly. If the build is missing we skip static serving.
-const fs = require('fs');
-// Prefer `frontend/build` (React-style) but fall back to `frontend/dist` (Vite default)
-const frontendBuild = path.join(__dirname, '..', '..', 'frontend', 'build');
-const frontendDist = path.join(__dirname, '..', '..', 'frontend', 'dist');
-try {
-  let indexPath = path.join(frontendBuild, 'index.html');
-  let serveDir = frontendBuild;
-  if (!fs.existsSync(indexPath)) {
-    indexPath = path.join(frontendDist, 'index.html');
-    serveDir = frontendDist;
-  }
-
-  if (fs.existsSync(indexPath)) {
-    app.use(express.static(serveDir));
-    app.get(/^\/(?!api).*/, (_req, res) => res.sendFile(indexPath));
-    console.log('[Server] Serving frontend from', serveDir);
-  } else {
-    console.log('[Server] No frontend build found (tried build/ and dist/); skipping static serving');
-  }
-} catch (err) {
-  console.warn('[Server] Error configuring static serving:', err && err.message ? err.message : err);
-}
-
-// ── Health check (PRD: GET /api/health) ───────────────────────────────────────
+// ── Health checks & Cron (API namespace) ──────────────────────────────────────
 app.get('/api/health', (_req, res) => res.json({ status: 'ok', ts: new Date() }));
-app.get('/health', (_req, res) => res.json({ status: 'ok', ts: new Date() }));
-
-// ── Manual cron trigger (DEV ONLY) ───────────────────────────────────────────
 app.get('/api/cron/trigger', async (_req, res) => {
   const { runStatusUpdate } = require('./cron/statusUpdater');
   runStatusUpdate().catch(err => console.error('[Cron] Manual trigger error:', err.message));
   return res.json({ message: 'Cron job triggered (running in background)' });
 });
 
-// ── Start cron job (scheduled) ────────────────────────────────────────────────
 require('./cron/statusUpdater');
+
+// ── Frontend Static & SPA Fallback (MUST BE LAST) ─────────────────────────────
+const frontendBuild = path.join(__dirname, '..', '..', 'frontend', 'build');
+const frontendDist = path.join(__dirname, '..', '..', 'frontend', 'dist');
+
+let serveDir = fs.existsSync(frontendBuild) ? frontendBuild : frontendDist;
+let indexPath = path.join(serveDir, 'index.html');
+
+if (fs.existsSync(indexPath)) {
+  console.log('[Server] Initializing SPA Fallback from:', serveDir);
+  app.use(express.static(serveDir));
+  
+  // Catch-all: serve index.html for any route not handled by API above
+  app.get('*', (req, res) => {
+    // If it's a missing API route, don't serve index.html, return 404
+    if (req.path.startsWith('/api')) {
+      return res.status(404).json({ error: 'API endpoint not found' });
+    }
+    res.sendFile(indexPath);
+  });
+} else {
+  console.log('[Server] Static build not found. Running in API-only mode.');
+}
 
 // ── Start server ──────────────────────────────────────────────────────────────
 const PORT = parseInt(process.env.PORT, 10) || 4000;
 const HOST = process.env.HOST || '0.0.0.0';
 
 const server = app.listen(PORT, HOST, () => {
-  // Prefer structured logging if available
   try {
     const logger = require('./lib/logger');
     logger.info('Server started', { host: HOST, port: PORT });
