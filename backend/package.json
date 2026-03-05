@@ -11,9 +11,9 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "test": "node scripts/test-api.js",
-    "start:with-frontend": "node scripts/start-with-frontend.js"
+    "start:with-frontend": "node scripts/start-with-frontend.js",
+    "postinstall": "cd ../frontend && npm ci && npm run build || true"
   },
-  "postinstall": "echo Building frontend... && (cd ../frontend && npm ci && npm run build) || echo 'frontend build skipped'",
   "nodemonConfig": {
     "ignore": [
       "scripts/*",
