@@ -1,0 +1,87 @@
+@import './fonts.css';
+@import './tailwind.css';
+@import './theme.css';
+
+/* ─── JURIS Global Design System ─────────────────────────────── */
+
+:root {
+  --juris-gold:        #F59E0B;
+  --juris-gold-light:  #FCD34D;
+  --juris-gold-dark:   #D97706;
+  --juris-gold-dim:    #B45309;
+  --juris-bg-deep:     #060B18;
+  --juris-bg-mid:      #0A1020;
+  --juris-bg-surface:  #0D1526;
+  --juris-glass:       rgba(255,255,255,0.04);
+  --juris-glass-hover: rgba(255,255,255,0.07);
+  --juris-border:      rgba(255,255,255,0.08);
+  --juris-border-gold: rgba(245,158,11,0.25);
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--juris-bg-deep);
+  color: #F1F5F9;
+}
+
+.font-display {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+/* Gold gradient text utility */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #FCD34D 0%, #F59E0B 50%, #D97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Juris glass card */
+.juris-card {
+  background: var(--juris-glass);
+  border: 1px solid var(--juris-border);
+  backdrop-filter: blur(16px);
+}
+
+/* Gold glow effects */
+.glow-gold {
+  box-shadow: 0 0 30px rgba(245, 158, 11, 0.15), 0 0 60px rgba(245, 158, 11, 0.05);
+}
+.glow-gold-sm {
+  box-shadow: 0 0 15px rgba(245, 158, 11, 0.2);
+}
+
+/* Animated gradient background */
+.juris-bg {
+  background: linear-gradient(135deg, #060B18 0%, #0A1020 40%, #0D1526 70%, #060B18 100%);
+}
+
+/* Noise texture overlay */
+.noise-overlay {
+  position: relative;
+}
+.noise-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(245, 158, 11, 0.3);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(245, 158, 11, 0.5);
+}

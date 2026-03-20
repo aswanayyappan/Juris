@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users — only the authenticated user can read/write their own document
+    match /users/{userId} {
+      function isSignedIn() { return request.auth != null; }
+      allow read: if isSignedIn() && request.auth.uid == userId;
+
+      allow create: if isSignedIn() && request.auth.uid == userId
+                    && request.resource.data.keys().hasAll(['displayName'])
+                    && !(request.resource.data.keys().hasAny(['role','isAdmin']));
+
+      allow update: if isSignedIn() && request.auth.uid == userId
+                    && !(request.resource.data.keys().hasAny(['role','isAdmin']));
+      allow delete: if false;
+    }
+
+    // Businesses — only the owner can read/write
+    match /businesses/{businessId} {
+      function isSignedIn() { return request.auth != null; }
+      allow read: if isSignedIn() && resource.data.ownerUid == request.auth.uid;
+
+      allow create: if isSignedIn() && request.resource.data.ownerUid == request.auth.uid
+                    && request.resource.data.keys().hasAll(['name','ownerUid']);
+
+      allow update: if isSignedIn()
+                    && get(/databases/$(database)/documents/businesses/$(businessId)).data.ownerUid == request.auth.uid
+                    && request.resource.data.ownerUid == resource.data.ownerUid;
+
+      match /tasks/{taskId} {
+        allow read: if isSignedIn() && request.auth.uid == get(/databases/$(database)/documents/businesses/$(businessId)).data.ownerUid;
+
+        allow create: if isSignedIn()
+                      && request.auth.uid == get(/databases/$(database)/documents/businesses/$(businessId)).data.ownerUid
+                      && request.resource.data.keys().hasOnly(['label','description','dueDate','completed'])
+                      && request.resource.data.label is string;
+
+        allow update: if isSignedIn()
+                      && request.auth.uid == get(/databases/$(database)/documents/businesses/$(businessId)).data.ownerUid
+                      && request.resource.data.keys().hasOnly(['label','description','dueDate','completed']);
+      }
+    }
+  }
+}
