@@ -14,6 +14,9 @@ import { ChatPage } from "./pages/ChatPage";
 import { MentorsPage } from "./pages/MentorsPage";
 import { MentorChatPage } from "./pages/MentorChatPage";
 import { ProfilePage } from "./pages/ProfilePage";
+import { ScrapedData } from "./pages/ScrapedData";
+import { Purchase } from "./pages/Purchase";
+import { ApiTest } from "./pages/ApiTest";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { JurisLayout } from "./components/JurisLayout";
 
@@ -82,8 +85,20 @@ export const router = createBrowserRouter([
         element: <Business />,
       },
       {
+        path: "scraped-data",
+        element: <ScrapedData />,
+      },
+      {
         path: "buy-credits",
         element: <BuyCredits />,
+      },
+      {
+        path: "api-test",
+        element: <ApiTest />,
+      },
+      {
+        path: "purchase",
+        element: <Purchase />,
       },
     ],
   },

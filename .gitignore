@@ -56,3 +56,5 @@ validation-baseline.json
 # Custom Workspace Ignores
 skills/
 Enhance website with 3D elements/
+Screenshot*.png
+BUSINESS_PAGE_TROUBLESHOOTING.md

@@ -68,7 +68,10 @@ router.get('/', (req, res) => {
 
     // Return all articles to let the frontend paginate them accurately
     const reversedArticles = articles.reverse();
-
+    console.log('[ESIC News API] Parsed articles:', reversedArticles.length, 'articles found');
+    if (reversedArticles.length > 0) {
+      console.log('[ESIC News API] First article:', reversedArticles[0]);
+    }
     res.json({ articles: reversedArticles });
   } catch (error) {
     console.error('[ESIC News API] Error parsing esic_circulars.txt:', error);

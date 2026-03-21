@@ -1,13 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import {
-  FileText,
   Building2,
-  Calculator,
   Briefcase,
-  ClipboardList,
-  ShieldAlert,
-  Activity,
   Bot,
   Users,
   ChevronRight,
@@ -15,8 +10,10 @@ import {
   AlertTriangle,
   CheckCircle2,
   Gavel,
+  Activity,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import { api } from "../utils/api";
 
 interface Module {
   id: string;
@@ -31,62 +28,11 @@ interface Module {
 
 const modules: Module[] = [
   {
-    id: "gst",
-    icon: <FileText size={18} />,
-    title: "GST & Tax Compliance",
-    description: "Manage GST returns, invoices, and tax filings",
-    path: "/gst-updates",
-    status: "2 pending",
-    statusType: "warning",
-  },
-  {
-    id: "roc",
-    icon: <Building2 size={18} />,
-    title: "ROC / MCA",
-    description: "Company registrations, annual returns, MCA filings",
-    status: "Up to date",
-    statusType: "ok",
-  },
-  {
-    id: "income-tax",
-    icon: <Calculator size={18} />,
-    title: "Income Tax",
-    description: "ITR filing, TDS management, advance tax planning",
-    status: "1 due soon",
-    statusType: "warning",
-  },
-  {
-    id: "labour",
+    id: "business",
     icon: <Briefcase size={18} />,
-    title: "Labour Law",
-    description: "PF, ESI, gratuity, and employment regulations",
-    path: "/esic-updates",
-    status: "3 alerts",
-    statusType: "alert",
-  },
-  {
-    id: "licenses",
-    icon: <ClipboardList size={18} />,
-    title: "Licenses & Registrations",
-    description: "Track all business licenses and renewal dates",
-    status: "1 expiring",
-    statusType: "warning",
-  },
-  {
-    id: "risk",
-    icon: <ShieldAlert size={18} />,
-    title: "Risk & Alerts",
-    description: "Real-time compliance risk monitoring and alerts",
-    status: "High priority",
-    statusType: "alert",
-  },
-  {
-    id: "health",
-    icon: <Activity size={18} />,
-    title: "Compliance Health",
-    description: "Overall compliance score and health dashboard",
-    status: "Score: 82/100",
-    statusType: "ok",
+    title: "Business Operations",
+    description: "Manage your company profile and core compliance filings",
+    path: "/business",
   },
   {
     id: "legal-advisory",
@@ -110,7 +56,6 @@ const modules: Module[] = [
     title: "AI Legal Assistant",
     description: "Ask legal questions and get instant compliance guidance from the AI",
     path: "/chat",
-    accent: true,
   },
 ];
 
@@ -120,16 +65,53 @@ const statusColors: Record<string, string> = {
   alert: "#EF4444",
 };
 
-const stats = [
-  { label: "Compliance Score", value: "82%", icon: <TrendingUp size={14} />, color: "#22C55E" },
-  { label: "Pending Actions", value: "7", icon: <AlertTriangle size={14} />, color: "#F59E0B" },
-  { label: "Modules Active", value: "9", icon: <CheckCircle2 size={14} />, color: "#C9A84C" },
-];
+const stats = [];
 
 export function Dashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [hovered, setHovered] = useState<string | null>(null);
+  const [gstNews, setGstNews] = useState<any[]>([]);
+  const [esicNews, setEsicNews] = useState<any[]>([]);
+
+  // Fetch scraped data on component mount
+  useEffect(() => {
+    const fetchScrapedData = async () => {
+      try {
+        console.log('[Dashboard] Fetching scraped data...');
+        
+        const gstRes = await api.get('/gst-news').catch((err: any) => {
+          console.error('[Dashboard] GST API error:', err);
+          return { articles: [] };
+        });
+        
+        const esicRes = await api.get('/esic-news').catch((err: any) => {
+          console.error('[Dashboard] ESIC API error:', err);
+          return { articles: [] };
+        });
+        
+        console.log('[Dashboard] GST response type:', typeof gstRes, 'has articles:', !!gstRes?.articles);
+        console.log('[Dashboard] ESIC response type:', typeof esicRes, 'has articles:', !!esicRes?.articles);
+        
+        // Get articles from response - api.get returns JSON directly (not wrapped in data)
+        const gstArticles = Array.isArray(gstRes?.articles) ? gstRes.articles : [];
+        const esicArticles = Array.isArray(esicRes?.articles) ? esicRes.articles : [];
+        
+        console.log('[Dashboard] GST articles count:', gstArticles.length);
+        console.log('[Dashboard] ESIC articles count:', esicArticles.length);
+        
+        if (gstArticles.length > 0) console.log('[Dashboard] First GST article:', gstArticles[0]);
+        if (esicArticles.length > 0) console.log('[Dashboard] First ESIC article:', esicArticles[0]);
+        
+        setGstNews(gstArticles.slice(0, 2));
+        setEsicNews(esicArticles.slice(0, 3));
+      } catch (err: any) {
+        console.error('[Dashboard] Unexpected error:', err);
+      }
+    };
+    
+    fetchScrapedData();
+  }, []);
 
   const handleModuleClick = (mod: Module) => {
     if (mod.path) {
@@ -139,7 +121,8 @@ export function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen px-6 py-8" style={{ maxWidth: "1280px", margin: "0 auto" }}>
+    <div className="flex flex-col h-screen px-6 py-8" style={{ maxWidth: "1280px", margin: "0 auto" }}>
+      <div className="flex-1 overflow-y-auto">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-end justify-between">
@@ -159,22 +142,6 @@ export function Dashboard() {
           </div>
           {/* Stats Row */}
           <div className="hidden md:flex items-center gap-3">
-            {stats.map((s, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg"
-                style={{
-                  background: "#0D1526",
-                  border: "1px solid rgba(255,255,255,0.05)",
-                }}
-              >
-                <span style={{ color: s.color }}>{s.icon}</span>
-                <div>
-                  <p className="text-xs" style={{ color: "#6B7280" }}>{s.label}</p>
-                  <p className="text-sm" style={{ color: "#E8EBF0", fontWeight: 500 }}>{s.value}</p>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
 
@@ -184,29 +151,37 @@ export function Dashboard() {
           style={{ background: "rgba(255,255,255,0.05)" }}
         />
       </div>
-
       {/* Module Grid */}
-      <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 lg:gap-6 mt-6">
         {modules.map((mod) => {
           const isHovered = hovered === mod.id;
-          const isClickable = !!mod.path;
+          const statusColor = mod.statusType
+            ? statusColors[mod.statusType]
+            : "transparent";
 
           return (
             <div
               key={mod.id}
-              onClick={() => handleModuleClick(mod)}
-              onMouseEnter={() => setHovered(mod.id)}
-              onMouseLeave={() => setHovered(null)}
-              className="relative rounded-lg p-6 flex flex-col gap-3 select-none"
+              className="relative p-5 rounded-2xl cursor-pointer transition-all duration-300 group"
               style={{
-                background: "#0D1526",
-                border: `1px solid ${isHovered ? "rgba(201,168,76,0.4)" : "rgba(255,255,255,0.05)"}`,
-                cursor: isClickable ? "pointer" : "default",
-                transform: isHovered ? "translateY(-2px)" : "translateY(0px)",
-                transition: "transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease",
+                background: isHovered ? "rgba(255,255,255,0.03)" : "#0D1526",
+                border: `1px solid ${
+                  isHovered
+                    ? mod.accent
+                      ? "rgba(201,168,76,0.3)"
+                      : "rgba(255,255,255,0.12)"
+                    : "rgba(255,255,255,0.05)"
+                }`,
                 boxShadow: isHovered
                   ? "0 4px 24px rgba(201,168,76,0.06)"
                   : "none",
+              }}
+              onMouseEnter={() => setHovered(mod.id)}
+              onMouseLeave={() => setHovered(null)}
+              onClick={() => {
+                if (mod.path) {
+                  navigate(mod.path, { state: { persona: mod.id } });
+                }
               }}
             >
               {/* Gold accent line for AI & Mentors */}
@@ -242,7 +217,7 @@ export function Dashboard() {
                     {mod.title}
                   </h3>
                 </div>
-                {isClickable && (
+                {!!mod.path && (
                   <ChevronRight
                     size={14}
                     style={{
@@ -292,8 +267,49 @@ export function Dashboard() {
         })}
       </div>
 
-      {/* Footer */}
-      <div className="mt-10 pt-6 border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
+      {/* Scraped Data Section */}
+      <div style={{ marginTop: '2rem' }}>
+        <h3 style={{ fontSize: '16px', fontWeight: 600, color: '#E8EBF0', marginBottom: '1rem' }}>Regulatory Updates</h3>
+        
+        {/* DEBUG INFO */}
+        <div style={{  background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px', marginBottom: '1rem', fontSize: '11px', color: '#9CA3AF' }}>
+          GST: {gstNews.length} articles | ESIC: {esicNews.length} articles
+        </div>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+          {/* GST News */}
+          <div style={{ border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', padding: '1.25rem', background: '#0D1526', cursor: 'pointer' }} onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(61,142,255,0.05)')} onMouseLeave={(e) => (e.currentTarget.style.background = '#0D1526')} onClick={() => navigate('/scraped-data', { state: { tab: 'gst' } })}>
+            <h4 style={{ fontSize: '13px', fontWeight: 600, color: '#3D8EFF', marginBottom: '0.75rem', textTransform: 'uppercase', cursor: 'pointer' }}>✓ GST Updates</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {gstNews.length > 0 ? gstNews.map((article: any, idx: number) => (
+                <div key={idx} style={{ paddingBottom: idx < gstNews.length - 1 ? '0.75rem' : '0', borderBottom: idx < gstNews.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none', cursor: 'pointer', transition: 'opacity 0.2s' }} onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.8')} onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}>
+                  <div style={{ fontSize: '11px', color: '#F59E0B', marginBottom: '0.25rem' }}>{article.date || 'Unknown'}</div>
+                  <div style={{ fontSize: '12px', color: '#E8EBF0', fontWeight: 500, lineHeight: 1.3 }}>{article.title}</div>
+                </div>
+              )) : <div style={{ fontSize: '11px', color: '#6B7280' }}>No updates available</div>}
+            </div>
+            <div style={{ marginTop: '0.75rem', fontSize: '11px', color: '#3D8EFF', fontWeight: 500 }}>View All →</div>
+          </div>
+
+          {/* ESIC News */}
+          <div style={{ border: '1px solid rgba(255,255,255,0.05)', borderRadius: '12px', padding: '1.25rem', background: '#0D1526', cursor: 'pointer' }} onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,68,85,0.05)')} onMouseLeave={(e) => (e.currentTarget.style.background = '#0D1526')} onClick={() => navigate('/scraped-data', { state: { tab: 'esic' } })}>
+            <h4 style={{ fontSize: '13px', fontWeight: 600, color: '#FF4455', marginBottom: '0.75rem', textTransform: 'uppercase', cursor: 'pointer' }}>✓ ESIC Circulars</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {esicNews.length > 0 ? esicNews.map((article: any, idx: number) => (
+                <div key={idx} style={{ paddingBottom: idx < esicNews.length - 1 ? '0.75rem' : '0', borderBottom: idx < esicNews.length - 1 ? '1px solid rgba(255,255,255,0.05)' : 'none', cursor: 'pointer', transition: 'opacity 0.2s' }} onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.8')} onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}>
+                  <div style={{ fontSize: '11px', color: '#F59E0B', marginBottom: '0.25rem' }}>{article.date || 'Unknown'}</div>
+                  <div style={{ fontSize: '12px', color: '#E8EBF0', fontWeight: 500, lineHeight: 1.3 }}>{article.title}</div>
+                </div>
+              )) : <div style={{ fontSize: '11px', color: '#6B7280' }}>No updates available</div>}
+            </div>
+            <div style={{ marginTop: '0.75rem', fontSize: '11px', color: '#FF4455', fontWeight: 500 }}>View All →</div>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      {/* Footer - Always at bottom */}
+      <div className="mt-auto pt-6 border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
         <p className="text-xs text-center" style={{ color: "#374151" }}>
           JURIS Compliance OS · v2.1.0 · All data encrypted and secure
         </p>

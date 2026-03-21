@@ -114,7 +114,7 @@ const server = app.listen(PORT, HOST, () => {
   }
   
   // Initiating the background scraping pipelines
-  initScrapers();
+  // initScrapers(); // DISABLED FOR NOW - only running backend API
 });
 
 // Graceful shutdown

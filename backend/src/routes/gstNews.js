@@ -5,6 +5,8 @@ const path = require('path');
 
 // Route: GET /api/gst-news
 router.get('/', (req, res) => {
+  console.log('[GST News API] Request received at', new Date().toISOString());
+  console.log('[GST News API] Headers:', req.headers);
   try {
     const filePath = path.join(__dirname, '../../scripts/gst/scarpp.txt');
     
@@ -64,7 +66,10 @@ router.get('/', (req, res) => {
 
     // Return the latest 20 articles (reversing the array so newest is first assuming append-only)
     const reversedArticles = articles.reverse().slice(0, 20);
-
+    console.log('[GST News API] Parsed articles:', reversedArticles.length, 'articles found');
+    if (reversedArticles.length > 0) {
+      console.log('[GST News API] First article:', reversedArticles[0]);
+    }
     res.json({ articles: reversedArticles });
   } catch (error) {
     console.error('[GST News API] Error parsing scarpp.txt:', error);

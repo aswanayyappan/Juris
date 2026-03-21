@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router";
 import { ThreeBackground } from "./ThreeBackground";
 import {
-  Search,
   Bell,
   Coins,
   CircleUser,
@@ -19,7 +18,6 @@ export function JurisLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
-  const [searchVal, setSearchVal] = useState("");
   const [showProfile, setShowProfile] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
 
@@ -44,8 +42,23 @@ export function JurisLayout() {
         { label: "Live Mentors", path: "/mentors" },
         { label: "Mentor Chat", path: p },
       ];
+    if (p === "/business")
+      return [{ label: "Business Operations", path: "/business" }];
+    if (p === "/gst-updates")
+      return [{ label: "GST & Tax Compliance", path: "/gst-updates" }];
+    if (p === "/gst-updates/details")
+      return [
+        { label: "GST & Tax Compliance", path: "/gst-updates" },
+        { label: "Update Details", path: p },
+      ];
+    if (p === "/esic-updates")
+      return [{ label: "Labour Law (ESIC)", path: "/esic-updates" }];
     if (p === "/profile")
       return [{ label: "Profile", path: "/profile" }];
+    if (p === "/purchase")
+      return [{ label: "Buy Credits", path: "/purchase" }];
+    if (p === "/scraped-data")
+      return [{ label: "Regulatory Updates", path: "/scraped-data" }];
     return null;
   };
 
@@ -120,28 +133,8 @@ export function JurisLayout() {
           </div>
         )}
 
-        {/* Search */}
-        <div className="flex-1 flex justify-center">
-          <div className="relative w-full max-w-sm">
-            <Search
-              size={13}
-              className="absolute left-3 top-1/2 -translate-y-1/2"
-              style={{ color: "#6B7280" }}
-            />
-            <input
-              type="text"
-              placeholder="Search modules, cases, advisors..."
-              value={searchVal}
-              onChange={(e) => setSearchVal(e.target.value)}
-              className="w-full pl-8 pr-4 py-1.5 text-xs rounded-md outline-none"
-              style={{
-                background: "rgba(13,21,38,0.8)",
-                border: "1px solid rgba(255,255,255,0.07)",
-                color: "#E8EBF0",
-              }}
-            />
-          </div>
-        </div>
+        {/* Space */}
+        <div className="flex-1" />
 
         {/* Right Controls */}
         <div className="flex items-center gap-3 ml-6">
@@ -230,8 +223,9 @@ export function JurisLayout() {
           </div>
 
           {/* Credits */}
-          <div
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md"
+          <button
+            onClick={() => navigate("/purchase")}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-md cursor-pointer hover:opacity-80 transition-opacity"
             style={{
               background: "rgba(201,168,76,0.08)",
               border: "1px solid rgba(201,168,76,0.2)",
@@ -244,7 +238,7 @@ export function JurisLayout() {
             >
               {user?.credits ?? 0}
             </span>
-          </div>
+          </button>
 
           {/* Profile */}
           <div className="relative">

@@ -2,6 +2,7 @@ const express   = require('express');
 const router    = express.Router();
 const { db, auth } = require('../lib/firebaseAdmin');
 const { Timestamp } = require('firebase-admin/firestore');
+const verify = require('../middleware/verifyFirebaseToken');
 const logger = require('../lib/logger');
 
 /**
@@ -67,6 +68,24 @@ router.post('/login', async (req, res) => {
   } catch (err) {
     console.error('[Auth] Login error:', err.message);
     return res.status(500).json({ error: 'Failed to process login' });
+  }
+});
+
+/**
+ * GET /api/auth/me
+ * Returns current user's profile based on token.
+ */
+router.get('/me', verify, async (req, res) => {
+  try {
+    const userRef = db.collection('users').doc(req.user.uid);
+    const snap = await userRef.get();
+    if (!snap.exists) {
+      return res.status(404).json({ error: 'User profile not found' });
+    }
+    return res.json({ user: snap.data() });
+  } catch (err) {
+    console.error('[Auth] Get /me error:', err.message);
+    return res.status(500).json({ error: 'Failed to fetch profile' });
   }
 });
 
