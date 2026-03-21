@@ -3,6 +3,8 @@ const express = require('express');
 const cors    = require('cors');
 const path    = require('path');
 const fs      = require('fs');
+const session = require('express-session');
+const rateLimit = require('express-rate-limit');
 const { initScrapers } = require('./services/scraperScheduler');
 
 const app = express();
@@ -24,6 +26,32 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
+
+// ── Security & Sessions ─────────────────────────────────────────────────────────
+// 1. Session Configuration
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'juris_secure_key_123',
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60 * 24 // 24 hours 
+  }
+}));
+
+// 2. Global Rate Limiter
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  message: { error: 'Too many requests from this IP, please try again after 15 minutes.' }
+});
+
+// Apply the rate limiter to all API routes
+app.use('/api/', apiLimiter);
 
 // ── API Routes ────────────────────────────────────────────────────────────────
 app.use('/api/auth',          require('./routes/auth'));

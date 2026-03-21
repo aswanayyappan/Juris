@@ -13,10 +13,12 @@ import {
   Copy,
   CheckCheck,
   Mic,
+  Users,
 } from "lucide-react";
 import { api } from "../utils/api";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { useLocation } from "react-router";
 
 interface Message {
   id: string;
@@ -25,12 +27,13 @@ interface Message {
   time: string;
 }
 
-const initialMessages: Message[] = [
+const getInitialMessages = (persona: string): Message[] => [
   {
     id: "1",
     role: "ai",
-    content:
-      "Hello, I'm JURIS AI — your legal compliance assistant. I can help you with GST queries, labour law, ROC filings, income tax matters, and more. How can I assist you today?",
+    content: persona === "mentor"
+      ? "Hello! I'm your JURIS AI Mentor. I'm here to support and guide you through your business compliance journey. How can I help you today? Feel free to ask anything!"
+      : "I am the JURIS Legal Assistant. State your corporate legal or tax compliance inquiry, and I will provide formal, structured legal guidance.",
     time: "09:00 AM",
   },
 ];
@@ -52,12 +55,20 @@ function getTime() {
 }
 
 export function ChatPage() {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const location = useLocation();
+  const persona = location.state?.persona || 'advisor';
+  
+  const [messages, setMessages] = useState<Message[]>(getInitialMessages(persona));
   const [input, setInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  // Reset chat if persona strictly changes seamlessly
+  useEffect(() => {
+    setMessages(getInitialMessages(persona));
+  }, [persona]);
 
   const adjustHeight = useCallback(() => {
     const ta = textareaRef.current;
@@ -85,7 +96,7 @@ export function ChatPage() {
     setIsTyping(true);
     
     try {
-      const response = await api.post<{ reply: string }>("/chat", { message: content });
+      const response = await api.post<{ reply: string }>("/chat", { message: content, persona });
       const aiMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: "ai",
@@ -130,21 +141,25 @@ export function ChatPage() {
       >
         <div
           className="w-8 h-8 rounded-lg flex items-center justify-center"
-          style={{ background: "rgba(201,168,76,0.12)" }}
+          style={{ background: persona === "mentor" ? "rgba(34,197,94,0.12)" : "rgba(201,168,76,0.12)" }}
         >
-          <Bot size={16} style={{ color: "#C9A84C" }} />
+          {persona === "mentor" ? (
+             <Users size={16} style={{ color: "#22C55E" }} />
+          ) : (
+             <Bot size={16} style={{ color: "#C9A84C" }} />
+          )}
         </div>
         <div>
           <p className="text-sm" style={{ color: "#E8EBF0", fontWeight: 500 }}>
-            JURIS AI Legal Assistant
+            {persona === "mentor" ? "JURIS AI Mentor" : "JURIS Legal Advisor"}
           </p>
           <div className="flex items-center gap-1.5">
             <div
               className="w-1.5 h-1.5 rounded-full animate-pulse"
-              style={{ background: "#22C55E" }}
+              style={{ background: persona === "mentor" ? "#22C55E" : "#C9A84C" }}
             />
             <p className="text-xs" style={{ color: "#6B7280" }}>
-              Online · Trained on Indian Law
+              {persona === "mentor" ? "Online · Supportive Guidance" : "Online · Indian Law Expert"}
             </p>
           </div>
         </div>
@@ -155,7 +170,7 @@ export function ChatPage() {
               border: "1px solid rgba(255,255,255,0.06)",
               color: "#6B7280",
             }}
-            onClick={() => setMessages(initialMessages)}
+            onClick={() => setMessages(getInitialMessages(persona))}
           >
             <RotateCcw size={12} />
             New Chat
@@ -177,12 +192,12 @@ export function ChatPage() {
                 style={{
                   background:
                     msg.role === "ai"
-                      ? "rgba(201,168,76,0.12)"
+                      ? persona === "mentor" ? "rgba(34,197,94,0.12)" : "rgba(201,168,76,0.12)"
                       : "rgba(255,255,255,0.05)",
                 }}
               >
                 {msg.role === "ai" ? (
-                  <Scale size={13} style={{ color: "#C9A84C" }} />
+                   persona === "mentor" ? <Users size={13} style={{ color: "#22C55E" }} /> : <Scale size={13} style={{ color: "#C9A84C" }} />
                 ) : (
                   <User size={13} style={{ color: "#9CA3AF" }} />
                 )}

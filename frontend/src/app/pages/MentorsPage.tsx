@@ -11,6 +11,8 @@ import {
   CheckCheck,
 } from "lucide-react";
 
+import { useLocation } from "react-router";
+
 export interface Mentor {
   id: string;
   name: string;
@@ -24,23 +26,25 @@ export interface Mentor {
   experience: string;
   languages: string[];
   fee: string;
+  category: "legal" | "mentor";
 }
 
 export const mentors: Mentor[] = [
+  // --- LEGAL DIRECTORY ---
   {
     id: "1",
-    name: "Adv. Rahul Mehta",
-    title: "Senior Tax Advocate",
-    expertise: ["GST", "Income Tax", "Tax Litigation"],
-    rating: 4.9,
-    chats: 312,
+    name: "Justice (Retd.) Anil Desai",
+    title: "Former High Court Judge",
+    expertise: ["Constitutional Law", "Arbitration", "Litigation"],
+    rating: 5.0,
+    chats: 142,
     available: true,
-    availableUntil: "8:00 PM",
-    avatar:
-      "https://images.unsplash.com/photo-1624670319970-37aa780d4874?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=200",
-    experience: "18 yrs",
-    languages: ["English", "Hindi", "Gujarati"],
-    fee: "₹800/hr",
+    availableUntil: "6:00 PM",
+    avatar: "https://images.unsplash.com/photo-1556157382-97eda2d62296?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=200",
+    experience: "35 yrs",
+    languages: ["English", "Marathi"],
+    fee: "₹5,000/hr",
+    category: "legal",
   },
   {
     id: "2",
@@ -51,91 +55,102 @@ export const mentors: Mentor[] = [
     chats: 278,
     available: true,
     availableUntil: "7:30 PM",
-    avatar:
-      "https://images.unsplash.com/photo-1736939666660-d4c776e0532c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=200",
+    avatar: "https://images.unsplash.com/photo-1736939666660-d4c776e0532c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=200",
     experience: "12 yrs",
     languages: ["English", "Hindi"],
     fee: "₹1,000/hr",
+    category: "legal",
   },
   {
     id: "3",
-    name: "CA Vikram Nair",
-    title: "Chartered Accountant",
-    expertise: ["Income Tax", "GST Returns", "Audit"],
-    rating: 4.7,
-    chats: 231,
+    name: "Adv. Rahul Mehta",
+    title: "Senior Tax Advocate",
+    expertise: ["GST", "Income Tax", "Tax Litigation"],
+    rating: 4.9,
+    chats: 312,
     available: false,
-    avatar:
-      "https://images.unsplash.com/photo-1652565436975-5ac0c22fb3ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=200",
-    experience: "15 yrs",
-    languages: ["English", "Malayalam"],
-    fee: "₹600/hr",
+    avatar: "https://images.unsplash.com/photo-1624670319970-37aa780d4874?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=200",
+    experience: "18 yrs",
+    languages: ["English", "Hindi", "Gujarati"],
+    fee: "₹800/hr",
+    category: "legal",
   },
+  // --- MENTOR DIRECTORY ---
   {
     id: "4",
-    name: "CA Arun Kumar",
-    title: "Senior Financial Advisor",
-    expertise: ["Labour Law", "PF & ESI", "Payroll"],
-    rating: 4.8,
-    chats: 189,
+    name: "Prof. Dr. Sameer Patil",
+    title: "Business Professor & Coach",
+    expertise: ["Startup Strategy", "Operations", "Fundraising"],
+    rating: 4.9,
+    chats: 450,
     available: true,
     availableUntil: "9:00 PM",
-    avatar:
-      "https://images.unsplash.com/photo-1763598461615-610264129bea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=200",
-    experience: "20 yrs",
-    languages: ["English", "Tamil"],
-    fee: "₹750/hr",
+    avatar: "https://images.unsplash.com/photo-1652565436975-5ac0c22fb3ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=200",
+    experience: "25 yrs",
+    languages: ["English", "Hindi"],
+    fee: "₹500/hr",
+    category: "mentor",
   },
   {
     id: "5",
-    name: "Adv. Sunita Rao",
-    title: "HR & Employment Law Expert",
-    expertise: ["Labour Law", "Licenses", "Registrations"],
-    rating: 4.6,
-    chats: 156,
+    name: "Neha Gupta",
+    title: "Founder Growth Mentor",
+    expertise: ["Marketing", "Team Scaling", "Leadership"],
+    rating: 4.7,
+    chats: 189,
     available: true,
-    availableUntil: "6:30 PM",
-    avatar:
-      "https://images.unsplash.com/photo-1736939678218-bd648b5ef3bb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=200",
+    availableUntil: "8:00 PM",
+    avatar: "https://images.unsplash.com/photo-1736939678218-bd648b5ef3bb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=200",
     experience: "10 yrs",
-    languages: ["English", "Telugu", "Hindi"],
-    fee: "₹700/hr",
+    languages: ["English"],
+    fee: "₹0 (Community)",
+    category: "mentor",
   },
   {
     id: "6",
-    name: "Adv. Meera Pillai",
-    title: "Compliance Risk Consultant",
-    expertise: ["Risk Assessment", "Compliance Health", "Regulatory"],
-    rating: 4.9,
+    name: "Arun Kumar",
+    title: "Agile Teacher & Tech Advisor",
+    expertise: ["Software Dev", "Agile Training", "Roadmapping"],
+    rating: 4.8,
     chats: 203,
     available: false,
-    avatar:
-      "https://images.unsplash.com/photo-1736939666660-d4c776e0532c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=60&w=200&fit=facearea&facepad=4",
+    avatar: "https://images.unsplash.com/photo-1763598461615-610264129bea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=200",
     experience: "14 yrs",
-    languages: ["English", "Hindi", "Malayalam"],
-    fee: "₹900/hr",
+    languages: ["English", "Tamil"],
+    fee: "₹600/hr",
+    category: "mentor",
   },
 ];
 
 const filterTabs = ["All", "Online", "GST & Tax", "Labour Law", "Corporate"];
 
 export function MentorsPage() {
+  const location = useLocation();
   const navigate = useNavigate();
+  const categoryFilter = location.state?.category || "legal"; // default to legal advisory
+
   const [activeFilter, setActiveFilter] = useState("All");
   const [search, setSearch] = useState("");
   const [bookmarked, setBookmarked] = useState<Set<string>>(new Set());
 
   const filtered = mentors.filter((m) => {
+    // 1. Enforce strict category match (Legal vs Mentor)
+    if (m.category !== categoryFilter) return false;
+
+    // 2. Process secondary search matches
     const matchSearch =
       !search ||
       m.name.toLowerCase().includes(search.toLowerCase()) ||
       m.expertise.some((e) => e.toLowerCase().includes(search.toLowerCase()));
+    
+    // 3. Process secondary tab matches
     const matchFilter =
       activeFilter === "All" ||
       (activeFilter === "Online" && m.available) ||
       m.expertise.some((e) =>
         e.toLowerCase().includes(activeFilter.toLowerCase())
       );
+      
     return matchSearch && matchFilter;
   });
 
@@ -158,10 +173,12 @@ export function MentorsPage() {
         <div className="flex items-end justify-between">
           <div>
             <h1 className="text-2xl" style={{ color: "#E8EBF0", fontWeight: 500 }}>
-              Live Mentors
+              {categoryFilter === "legal" ? "Live Legal Advisory" : "Live Mentors"}
             </h1>
             <p className="text-sm mt-1" style={{ color: "#6B7280" }}>
-              Connect with verified legal experts and chartered accountants
+              {categoryFilter === "legal" 
+                ? "Connect with verified Advocates, Judges, and Legal Experts" 
+                : "Connect with Teachers, Coaches, and Business Strategy Mentors"}
             </p>
           </div>
           <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: "#0D1526", border: "1px solid rgba(255,255,255,0.05)" }}>

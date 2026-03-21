@@ -48,16 +48,25 @@ async function fetchCaseDetails(searchTerm) {
 // ── Route ─────────────────────────────────────────────────────────────────────
 router.post('/', async (req, res) => {
   const userMessage = req.body.message;
+  const persona = req.body.persona || 'advisor';
+  
   if (!userMessage) {
     return res.json({ reply: '📢 Please enter a valid query.' });
   }
 
   try {
-    const systemPrompt = `You are the JURIS Legal Assistant, a premium and authoritative AI specialized in Indian Law. 
+    let systemPrompt = `You are the JURIS Legal Assistant, a premium and authoritative AI specialized in Indian Law. 
     Your tone must be professional, direct, and empathetic. 
     CRITICAL: Go straight to the answer without meta-filler. 
     Use RICH MARKDOWN: Enforce the use of headers (###), bolding (**), bullet points, and tables (|) for structured comparisons. 
     Your goal is to provide beautiful, clean, and highly professional legal documentation in the chat.`;
+
+    if (persona === 'mentor') {
+      systemPrompt = `You are the JURIS AI Mentor, an empathetic, supportive, and highly encouraging business and compliance mentor for startups in India.
+      Your tone MUST be incredibly friendly, positive, and conversational. Use emojis! 😊 🚀
+      CRITICAL: You are acting as a MENTOR, not a strict lawyer. Guide the user gently. Offer broad business advice, motivate them, and explain complex compliance terms in simple English.
+      Use RICH MARKDOWN formatting (bolding, spacing, bullet points) to make your mentoring visually pleasing.`;
+    }
 
     // 1. Determine if we should search or just respond
     const analysisPrompt = `Analyze this user message: "${userMessage}". 

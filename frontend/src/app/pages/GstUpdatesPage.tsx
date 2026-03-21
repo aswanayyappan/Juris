@@ -2,6 +2,16 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, ExternalLink, FileText, Calendar } from "lucide-react";
 import { useNavigate } from "react-router";
 import { api } from "../utils/api";
+import { usePagination } from "@/components/hooks/use-pagination";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface Article {
   id: string;
@@ -18,6 +28,21 @@ export function GstUpdatesPage() {
   const [returnsArticles, setReturnsArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  // Derive the active array
+  const activeData = activeTab === 'news' ? articles : returnsArticles;
+
+  const { pages, showLeftEllipsis, showRightEllipsis } = usePagination({
+    currentPage,
+    totalPages: Math.ceil(activeData.length / itemsPerPage),
+    paginationItemsToDisplay: 5,
+  });
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedArticles = activeData.slice(startIndex, startIndex + itemsPerPage);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,7 +90,7 @@ export function GstUpdatesPage() {
       {/* Tab Navigation */}
       <div className="flex gap-4 mb-6 border-b" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
         <button
-          onClick={() => setActiveTab('news')}
+          onClick={() => { setActiveTab('news'); setCurrentPage(1); }}
           className={`pb-3 px-1 text-sm font-medium transition-colors border-b-2`}
           style={{ 
             color: activeTab === 'news' ? "#E8EBF0" : "#6B7280",
@@ -77,7 +102,7 @@ export function GstUpdatesPage() {
           News / Updates
         </button>
         <button
-          onClick={() => setActiveTab('returns')}
+          onClick={() => { setActiveTab('returns'); setCurrentPage(1); }}
           className={`pb-3 px-1 text-sm font-medium transition-colors border-b-2`}
           style={{ 
             color: activeTab === 'returns' ? "#E8EBF0" : "#6B7280",
@@ -100,13 +125,13 @@ export function GstUpdatesPage() {
         <div className="rounded-lg p-6 text-center" style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)" }}>
           <p className="text-sm text-red-400">{error}</p>
         </div>
-      ) : (activeTab === 'news' ? articles : returnsArticles).length === 0 ? (
+      ) : activeData.length === 0 ? (
         <div className="rounded-lg p-10 text-center" style={{ background: "#0D1526", border: "1px solid rgba(255,255,255,0.05)" }}>
           <p className="text-sm" style={{ color: "#9CA3AF" }}>No GST data found for this category. The scraper may need time to collect data.</p>
         </div>
       ) : (
         <div className="flex flex-col gap-4">
-          {(activeTab === 'news' ? articles : returnsArticles).map((article) => (
+          {paginatedArticles.map((article) => (
             <div
               key={article.id}
               onClick={() => navigate('/gst-updates/details', { state: { article } })}
@@ -148,6 +173,61 @@ export function GstUpdatesPage() {
               </a>
             </div>
           ))}
+          
+          {/* Pagination Controls */}
+          {activeData.length > itemsPerPage && (
+            <div className="mt-8 mb-4">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      aria-disabled={currentPage === 1}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                    />
+                  </PaginationItem>
+                  
+                  {showLeftEllipsis && (
+                    <PaginationItem>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  )}
+                  
+                  {pages.map((page) => (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        isActive={page === currentPage}
+                        onClick={() => setCurrentPage(page)}
+                        className="cursor-pointer"
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  
+                  {showRightEllipsis && (
+                    <PaginationItem>
+                      <PaginationEllipsis />
+                    </PaginationItem>
+                  )}
+                  
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() =>
+                        setCurrentPage((p) => Math.min(Math.ceil(activeData.length / itemsPerPage), p + 1))
+                      }
+                      aria-disabled={currentPage === Math.ceil(activeData.length / itemsPerPage)}
+                      className={
+                        currentPage === Math.ceil(activeData.length / itemsPerPage)
+                          ? "pointer-events-none opacity-50"
+                          : "cursor-pointer"
+                      }
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </div>
       )}
     </div>

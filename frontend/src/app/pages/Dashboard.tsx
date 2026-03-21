@@ -14,6 +14,7 @@ import {
   TrendingUp,
   AlertTriangle,
   CheckCircle2,
+  Gavel,
 } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -88,19 +89,27 @@ const modules: Module[] = [
     statusType: "ok",
   },
   {
-    id: "ai",
-    icon: <Bot size={18} />,
-    title: "AI Legal Assistant",
-    description: "Ask legal questions, get instant compliance guidance",
-    path: "/chat",
+    id: "legal-advisory",
+    icon: <Gavel size={18} />,
+    title: "Live Legal Advisory",
+    description: "Connect with real expert lawyers in real time",
+    path: "/mentors",
     accent: true,
   },
   {
     id: "mentors",
     icon: <Users size={18} />,
     title: "Live Mentors",
-    description: "Connect with expert lawyers and CAs in real time",
+    description: "Connect with experienced CAs and business mentors",
     path: "/mentors",
+    accent: true,
+  },
+  {
+    id: "ai-assistant",
+    icon: <Bot size={18} />,
+    title: "AI Legal Assistant",
+    description: "Ask legal questions and get instant compliance guidance from the AI",
+    path: "/chat",
     accent: true,
   },
 ];
@@ -123,7 +132,10 @@ export function Dashboard() {
   const [hovered, setHovered] = useState<string | null>(null);
 
   const handleModuleClick = (mod: Module) => {
-    if (mod.path) navigate(mod.path);
+    if (mod.path) {
+      const state = mod.id === "legal-advisory" ? { category: 'legal' } : mod.id === "mentors" ? { category: 'mentor' } : undefined;
+      navigate(mod.path, { state });
+    }
   };
 
   return (

@@ -54,7 +54,15 @@ router.post('/login', async (req, res) => {
       profile.createdAt = profile.createdAt.toDate().toISOString();
     }
 
-    logger.info('User login', { email, uid });
+    // Initialize express-session state tracking locally
+    req.session.user = {
+      uid: profile.uid,
+      email: profile.email,
+      role: profile.role,
+      displayName: profile.displayName
+    };
+
+    logger.info('User login and session initialized', { email, uid });
     return res.status(200).json(profile);
   } catch (err) {
     console.error('[Auth] Login error:', err.message);
@@ -80,7 +88,14 @@ router.post('/logout', async (req, res) => {
     const decoded = await auth.verifyIdToken(token);
     // Revoke all refresh tokens → forces every other session to re-authenticate
     await auth.revokeRefreshTokens(decoded.uid);
-    logger.info('User logout & tokens revoked', { email: decoded.email, uid: decoded.uid });
+    
+    // Terminate local Express session
+    req.session.destroy((err) => {
+      if (err) console.error('[Auth] Error destroying express session:', err);
+    });
+    res.clearCookie('connect.sid'); // Clear the default session cookie framework
+    
+    logger.info('User logout & tokens revoked, session destroyed', { email: decoded.email, uid: decoded.uid });
     return res.status(200).json({ message: 'Logged out successfully' });
   } catch (err) {
     console.error('[Auth] Logout error:', err.message);
