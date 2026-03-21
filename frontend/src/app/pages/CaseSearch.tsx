@@ -1,8 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { AppLayout } from '../components/AppLayout';
-import { Search, FileText, Download, ChevronDown, ChevronUp, Scale, Calendar, Hash } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { api } from '../utils/api';
+import React, { useState, useEffect } from "react";
+import { 
+  Search, 
+  FileText, 
+  Download, 
+  ChevronRight, 
+  ChevronUp,
+  ChevronDown,
+  TrendingUp, 
+  Hash,
+  Scale,
+  Calendar
+} from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { api } from "../utils/api";
+import { AppLayout } from "../components/AppLayout";
 
 interface Case {
   id: string;

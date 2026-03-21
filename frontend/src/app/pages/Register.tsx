@@ -1,11 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router';
-import { motion } from 'motion/react';
-import { Scale, Mail, Lock, User, AlertCircle, Eye, EyeOff, ArrowRight } from 'lucide-react';
-import { signUp } from '../utils/auth';
-import { useAuth } from '../contexts/AuthContext';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router";
+import {
+  Scale,
+  Mail,
+  Lock,
+  User,
+  AlertCircle,
+  Eye,
+  EyeOff,
+  ArrowRight,
+} from "lucide-react";
+import { motion } from "framer-motion";
+import { signUp } from "../utils/auth";
+import { useAuth } from "../contexts/AuthContext";
 
-type Role = 'user' | 'legal_assistant';
+type Role = "user" | "legal_assistant";
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();

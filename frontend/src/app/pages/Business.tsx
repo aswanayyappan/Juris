@@ -1,11 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { AppLayout } from '../components/AppLayout';
-import {
-  Building2, TrendingUp, AlertTriangle, CheckCircle2, Clock,
-  ChevronRight, Plus, RefreshCw
-} from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { api } from '../utils/api';
+import React, { useState, useEffect } from "react";
+import { 
+  Building2, 
+  TrendingUp, 
+  AlertTriangle, 
+  CheckCircle2, 
+  Plus, 
+  RefreshCw, 
+  Clock 
+} from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { api } from "../utils/api";
+import { AppLayout } from "../components/AppLayout";
 
 interface Business {
   name: string;

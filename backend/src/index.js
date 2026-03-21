@@ -3,6 +3,7 @@ const express = require('express');
 const cors    = require('cors');
 const path    = require('path');
 const fs      = require('fs');
+const { initScrapers } = require('./services/scraperScheduler');
 
 const app = express();
 
@@ -35,6 +36,9 @@ app.use('/api/chat',          require('./routes/chat'));
 app.use('/api/cases',         require('./routes/cases'));
 app.use('/api/download',      require('./routes/download'));
 app.use('/api/experts',       require('./routes/experts'));
+app.use('/api/gst-news',      require('./routes/gstNews'));
+app.use('/api/gst-returns',   require('./routes/gstReturns'));
+app.use('/api/esic-news',     require('./routes/esicNews'));
 
 // ── Health checks & Cron (API namespace) ──────────────────────────────────────
 app.get('/api/health', (_req, res) => res.json({ status: 'ok', ts: new Date() }));
@@ -80,6 +84,9 @@ const server = app.listen(PORT, HOST, () => {
   } catch (e) {
     console.log(`[Server] JURIS backend running on http://${HOST}:${PORT}`);
   }
+  
+  // Initiating the background scraping pipelines
+  initScrapers();
 });
 
 // Graceful shutdown

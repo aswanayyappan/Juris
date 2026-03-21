@@ -52,3 +52,7 @@ validation-baseline.json
 
 # Ignore log files
 *.log
+
+# Custom Workspace Ignores
+skills/
+Enhance website with 3D elements/

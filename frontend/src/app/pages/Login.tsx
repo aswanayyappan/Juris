@@ -1,9 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router';
-import { motion } from 'motion/react';
-import { Scale, Mail, Lock, AlertCircle, Eye, EyeOff, ArrowRight } from 'lucide-react';
-import { signIn, signInWithGoogle } from '../utils/auth';
-import { useAuth } from '../contexts/AuthContext';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router";
+import { 
+  Scale, 
+  Mail, 
+  Lock, 
+  AlertCircle, 
+  Eye, 
+  EyeOff, 
+  ArrowRight 
+} from "lucide-react";
+import { motion } from "framer-motion";
+import { signIn, signInWithGoogle } from "../utils/auth";
+import { useAuth } from "../contexts/AuthContext";
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -27,7 +35,6 @@ export const Login: React.FC = () => {
     setLoading(true);
     try {
       await signIn(email, password);
-      // Navigation is handled by the useEffect above watching isAuthenticated
     } catch (err: any) {
       setError(err.message || 'Failed to sign in');
       setLoading(false);
@@ -39,7 +46,6 @@ export const Login: React.FC = () => {
     setLoading(true);
     try {
       await signInWithGoogle();
-      // Navigation is handled by the useEffect above watching isAuthenticated
     } catch (err: any) {
       setError(err.message || 'Google sign-in failed');
       setLoading(false);
@@ -135,7 +141,6 @@ export const Login: React.FC = () => {
 
             {/* Password */}
             <div className="space-y-1.5">
-
               <div className="relative">
                 <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
                 <input
@@ -203,8 +208,6 @@ export const Login: React.FC = () => {
               background: 'rgba(255,255,255,0.05)',
               border: '1px solid rgba(255,255,255,0.10)',
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.05)')}
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24">
               <path fill="#EA4335" d="M5.26620003,9.76452941 C6.19878754,6.93863203 8.85444915,4.90909091 12,4.90909091 C13.6909091,4.90909091 15.2181818,5.50909091 16.4181818,6.49090909 L19.9090909,3 C17.7818182,1.14545455 15.0545455,0 12,0 C7.27006974,0 3.1977497,2.69829785 1.23999023,6.65002441 L5.26620003,9.76452941 Z" />

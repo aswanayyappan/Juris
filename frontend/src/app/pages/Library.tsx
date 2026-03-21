@@ -1,10 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { AppLayout } from '../components/AppLayout';
-import {
-  BookOpen, ChevronDown, ChevronUp, AlertCircle, Calendar, Bell, Download
-} from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
-import { api } from '../utils/api';
+import React, { useState, useEffect } from "react";
+import { 
+  BookOpen, 
+  ChevronDown, 
+  ChevronUp, 
+  AlertCircle, 
+  Download, 
+  Calendar, 
+  Bell 
+} from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
+import { api } from "../utils/api";
+import { AppLayout } from "../components/AppLayout";
 
 interface LibraryArticle {
   id: string;

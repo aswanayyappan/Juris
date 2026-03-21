@@ -135,6 +135,5 @@ console.log(`GST Auto-Scraper started. Checking every ${INTERVAL_MINUTES} minute
 console.log(`Output: ${OUTPUT_TXT}`);
 console.log(`Seen URLs tracked in: ${SEEN_URLS_FILE}\n`);
 
-// Run immediately on start, then on interval
+// Run immediately
 runScrape();
-setInterval(runScrape, INTERVAL_MINUTES * 60 * 1000);

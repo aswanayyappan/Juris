@@ -7,7 +7,15 @@ import { CaseSearch } from "./pages/CaseSearch";
 import { Library } from "./pages/Library";
 import { Business } from "./pages/Business";
 import { BuyCredits } from "./pages/BuyCredits";
+import { GstUpdatesPage } from "./pages/GstUpdatesPage";
+import { GstUpdateDetailsPage } from "./pages/GstUpdateDetailsPage";
+import { EsicUpdatesPage } from "./pages/EsicUpdatesPage";
+import { ChatPage } from "./pages/ChatPage";
+import { MentorsPage } from "./pages/MentorsPage";
+import { MentorChatPage } from "./pages/MentorChatPage";
+import { ProfilePage } from "./pages/ProfilePage";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { JurisLayout } from "./components/JurisLayout";
 
 export const router = createBrowserRouter([
   {
@@ -23,44 +31,61 @@ export const router = createBrowserRouter([
     element: <Register />,
   },
   {
-    path: "/dashboard",
     element: (
       <ProtectedRoute>
-        <Dashboard />
+        <JurisLayout />
       </ProtectedRoute>
     ),
-  },
-  {
-    path: "/case-search",
-    element: (
-      <ProtectedRoute>
-        <CaseSearch />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/library",
-    element: (
-      <ProtectedRoute>
-        <Library />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/business",
-    element: (
-      <ProtectedRoute>
-        <Business />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/buy-credits",
-    element: (
-      <ProtectedRoute>
-        <BuyCredits />
-      </ProtectedRoute>
-    ),
+    children: [
+      {
+        path: "dashboard",
+        element: <Dashboard />,
+      },
+      {
+        path: "chat",
+        element: <ChatPage />,
+      },
+      {
+        path: "gst-updates",
+        element: <GstUpdatesPage />,
+      },
+      {
+        path: "gst-updates/details",
+        element: <GstUpdateDetailsPage />,
+      },      
+      {
+        path: "esic-updates",
+        element: <EsicUpdatesPage />,
+      },
+      {
+        path: "mentors",
+        element: <MentorsPage />,
+      },
+      {
+        path: "mentors/:id",
+        element: <MentorChatPage />,
+      },
+      {
+        path: "profile",
+        element: <ProfilePage />,
+      },
+      {
+        path: "case-search",
+        element: <CaseSearch />,
+      },
+      {
+        path: "library",
+        element: <Library />,
+      },
+      {
+        path: "business",
+        element: <Business />,
+      },
+      {
+        path: "buy-credits",
+        element: <BuyCredits />,
+      },
+    ],
   },
   {
     path: "*",
